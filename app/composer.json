@@ -1,0 +1,10 @@
+{
+	"require":
+	{
+		"slim/slim": "2.4",
+		"slim/slim-skeleton": "dev-master",
+		"ircmaxell/password-compat": "dev-master",
+		"illuminate/session": "v4.0.9",
+		"phpmailer/phpmailer": "dev-master"
+	}
+}

@@ -1,0 +1,107 @@
+/* CSS Document */
+
+/******************************
+ * Text Colors
+ ******************************/
+ 
+ a{
+	 color:#4f82b7;
+ }
+ a:focus,
+ a:active,
+ a:hover{
+	 color:#85a7cc; 
+ }
+
+ th,
+ th.sorting,
+ th.sorting_asc,
+ th.sorting_desc{
+	color:#4f82b7; 
+ }
+ 
+ 
+/******************************
+ * Header / Footer
+ ******************************/
+ html,
+ body.login,
+ #app-header,
+ #app-footer {
+	background: #85a7cc;
+ }
+ 
+ #app-header {
+	border-bottom-color:#4f82b7;
+ }
+ #app-footer {
+	border-top-color:#4f82b7;
+	background: #85a7cc;
+ }
+ #app-header .navbar-toggle .icon-bar{
+	background:#4f82b7;
+ }
+ 
+ #app-header #main-nav > ul > li a i.nav-icon{
+	color:#4f82b7;	 
+ }
+ 
+ #app-header #main-nav > ul > li.open > a,
+ #app-header #main-nav > ul > li.active > a,
+ #app-header #main-nav > ul > li > a:hover{
+	color:#4f82b7;
+ }
+ #app-header #main-nav > ul > li.open > a > .caret,
+ #app-header #main-nav > ul > li.active > a > .caret,
+ #app-header #main-nav > ul > li > a:hover > .caret{
+	border-top-color:#4f82b7;	
+ }
+ 
+ #app-header .dropdown-menu.add {
+	border-color:#4f82b7; 
+ }
+ 
+/*********************************************
+ * Shorten Bar
+ *********************************************/ 
+ 
+ #shorten-bar{
+	 background-color:#4f82b7;
+ }
+ #shorten-bar label{
+	 color:#ffffff;
+ }
+ 
+/********************************************
+ * Tables
+ ********************************************/
+ 
+ th.th{
+	 color:#000000;
+ }
+ th.th i.fa,
+ .footable.breakpoint>tbody>tr>td>span.footable-toggle {
+  color:#f48400;
+ }
+ 
+ 
+/*********************************************
+ * BROWSER TABLET PORTRAIT AND UP
+ *********************************************/  
+ 
+ @media (min-width: 768px) { 
+
+	#app-header #main-nav > ul > li.open > a,
+	#app-header #main-nav > ul > li.active > a,
+	#app-header #main-nav > ul > li > a:hover{
+		border-top-color:#4f82b7;
+		border-left-color:#4f82b7;
+		border-right-color:#4f82b7;
+		border-bottom-color:#4f82b7;
+	}	
+ 
+ 	#app-header .dropdown-menu.add > li > a{
+		color:#428bca;
+	}
+ 
+ }

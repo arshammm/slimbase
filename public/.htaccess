@@ -1,0 +1,72 @@
+#START Uniserver Commands
+
+#------------------------------------------------------------------------------
+# This file provides server security limiting access to the localhost only.
+# Comment next four lines to deactivate. (Allows external access)
+#------------------------------------------------------------------------------
+
+#Order Deny,Allow
+#Deny from all
+#Allow from 127.0.0.1
+#Allow from ::1
+
+#------------------------------------------------------------------------------
+# To allow execution of cgi scripts in this directory uncomment next two lines.
+#------------------------------------------------------------------------------.
+
+#AddHandler cgi-script .bat .exe .pl .cgi
+Options +ExecCGI +FollowSymLinks
+
+#END Uniserver Commands
+
+#force redirects to https on live host
+RewriteEngine On
+RewriteCond %{HTTPS} off
+#dont redirect javascript files
+RewriteCond %{REQUEST_URI} !(\.js)$ [NC]
+RewriteCond %{HTTP_HOST} ^trksit\.kindred\.com [NC] 
+RewriteRule ^(.*)$ https://trksit.kindred.com/$1 [L,R=301]
+
+#force redirects to https on staging host
+RewriteEngine On
+RewriteCond %{HTTPS} off
+#dont redirect javascript files
+RewriteCond %{REQUEST_URI} !(\.js)$ [NC]
+RewriteCond %{HTTP_HOST} ^kindred\.trks\.it [NC] 
+RewriteRule ^(.*)$ https://kindred.trks.it/$1 [L,R=301]
+
+#deflate trks.it cookie file
+<ifModule mod_deflate.c>
+  <filesMatch (trks-it-cookie.min.js|trks-it-cookie.js|reqwest.min.js)$>
+    SetOutputFilter DEFLATE
+  </filesMatch>
+</ifModule>
+
+#gzip trks.it cookie file
+<ifModule mod_gzip.c>
+mod_gzip_on Yes
+mod_gzip_dechunk Yes
+mod_gzip_item_include file (trks-it-cookie.min.js|trks-it-cookie.js|reqwest.min.js)$
+mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
+</ifModule>
+
+#tell browsers to cache js files
+<IfModule mod_expires.c>
+  # Set up caching on media files for 1 month
+  <filesMatch (trks-it-cookie.min.js|trks-it-cookie.js|reqwest.min.js)$>
+  ExpiresDefault A2419200
+  Header append Cache-Control "public"
+  </filesMatch>
+</IfModule>
+
+#slim framework redirection
+RewriteEngine On
+
+# Some hosts may require you to use the `RewriteBase` directive.
+# If you need to use the `RewriteBase` directive, it should be the
+# absolute physical path to the directory that contains this htaccess file.
+#
+# RewriteBase /
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
