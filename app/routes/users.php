@@ -147,45 +147,6 @@ $app->map('/users/:user_id',$authenticate($app,$session),function ($user_id) use
 					if( $result != false ){
 						$found_user = $result;
 
-						//get all groups
-						try{
-							$groups = $app->db->query('SELECT * FROM groups');
-							$result = $groups->fetchAll(PDO::FETCH_ASSOC);
-
-							if( $result != false ){
-								$all_groups = $result;
-								//save all groups to session so we can remove users from groups later on without another query
-								$session->put('all_groups',$all_groups);
-
-								//get user groups
-								try{
-									$groups = $app->db->prepare('SELECT group_id FROM groups WHERE group_id IN (SELECT b.group_id FROM users_groups b WHERE user_id = :user_id)');
-									$groups->execute(array('user_id'=>$user_id));
-									$result = $groups->fetchAll(PDO::FETCH_ASSOC);
-
-									if( $result != false ){
-										$found_groups = $result;
-										//match the user groups with all groups. If user is found in a group, add a key to the all groups to indicate user belongs to this group
-										foreach( $all_groups as $key=>$group){
-											if( in_array_r($group['group_id'],$found_groups) ){
-												$all_groups[$key]['user_belongs'] = true;
-											}
-										}
-									}
-
-								}catch( PDOException $e){
-									//log databse errors
-									database_errors($e);
-									$errors['system_error'] = "System error. Please contact system administrator";
-								}
-							}
-
-						}catch( PDOException $e){
-							//log database errors
-							database_errors($e);
-							$errors['system_error'] = "System error. Please contact system administrator";
-						}
-
 						//get all types
 						try{
 							$user_types = $app->db->query('SELECT * FROM users_types');
@@ -230,7 +191,6 @@ $app->map('/users/:user_id',$authenticate($app,$session),function ($user_id) use
 				$app->render('edit-users.php',array(
 						'submit_url' => '/users/'.$user_id,
 						'user_groups'=>(isset($found_groups)?$found_groups:null),
-						'all_groups'=>(isset($all_groups)?$all_groups:null),
 						'found_user_type'=>(isset($found_user_type)?$found_user_type:null),
 						'all_user_types'=>(isset($all_user_types)?$all_user_types:null),
 						'user'=>(isset($found_user)?$found_user:null),
@@ -289,56 +249,6 @@ $app->map('/users/:user_id',$authenticate($app,$session),function ($user_id) use
 						//success message
 						$success[] = $first_name . ' ' . $last_name . ' successfully updated.'; 
 						
-						if( $app->admin ){
-							if( !empty($selected_groups) ){
-								foreach($selected_groups as $group){
-									try{
-										$sql = $app->db->prepare('INSERT INTO users_groups (user_id,group_id) VALUES (:user_id,:group_id) ON DUPLICATE KEY UPDATE group_id = :group_id');
-										$result = $sql->execute(array(
-												'user_id'=>$user_id,
-												'group_id'=>$group
-											));
-											
-									}catch(PDOException $e){
-										//log database errors
-										database_errors($e);
-										$errors['system_error'] = "System error. Please contact system administrator";
-									}
-								}
-							}
-
-							//remove users from groups
-							if( $session->has('all_groups') ){
-								$number_of_groups = count($session->get('all_groups'));
-								$temp = $session->get('all_groups');
-								//if the user didn't slect any groups
-								if( !empty($selected_groups) ){
-									for( $i=0; $i<$number_of_groups;$i++ ){
-										if( in_array_r($temp[$i]['group_id'],$selected_groups) ){
-											//if the group was found in the selected groups, remove the group id from the session
-											unset($temp[$i]);
-										}
-									}
-								}
-
-								//delete users from groups if the group was not selected by the admin
-								if( !empty($temp) ){
-									$temp = array_values($temp);
-									$number_groups_remove = count($temp);
-									$delete_string = "";
-									//build query to delete user from groups
-									for( $i=0;$i<$number_groups_remove;$i++ ){
-										if( (($number_groups_remove - $i) === 1?true:false) )
-										$delete_string .= $temp[$i]['group_id'];
-										else
-											$delete_string .= $temp[$i]['group_id'].",";
-									}
-									if( isset($delete_string) ){
-										$sql = $app->db->query('DELETE FROM users_groups WHERE group_id IN ('.$delete_string.') AND user_id = '.$user_id);
-									}
-								}
-							}
-						}
 					}
 
 				}catch (PDOException $e) {
